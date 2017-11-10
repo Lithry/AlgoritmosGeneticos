@@ -221,7 +221,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 1923639877900390, guid: 17111e32290c116408d0eb455f97ddf3, type: 2}
   NumOfAgents: 10
+  NumOfGensPerAgent: 10
+  numOfElites: 2
+  mutationProbability: 0
   durationOfSimulation: 20
+  speedOfSimulation: 1
 --- !u!4 &1568482145
 Transform:
   m_ObjectHideFlags: 0

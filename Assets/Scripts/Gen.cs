@@ -11,6 +11,11 @@ public class Gen {
         time = Random.Range(Actions.MinTime, Actions.MaxTime);
     }
 
+    public Gen(int action, float time){
+        this.action = action;
+        this.time = time;
+    }
+
     public int GetAction(){
         return action;
     }
@@ -18,5 +23,4 @@ public class Gen {
     public float GetTime(){
         return time;
     }
-	
 }

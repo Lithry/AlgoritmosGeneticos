@@ -6,37 +6,65 @@ public class Agent : MonoBehaviour {
     private Chromosome chromosome;
     private Rigidbody2D rb;
     private float waitFor;
-    public int numOfActions;
+    private bool active;
+    private int numOfActions;
+    private int genIndex;
     public float force;
+    private int points;
 
     void Awake(){
-        chromosome = new Chromosome(numOfActions);
+        genIndex = 0;
+        active = false;
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update(){
-        waitFor += Time.deltaTime;
-        if (waitFor >= chromosome.GetCurrentGenTime()){
-            chromosome.NextGen();
-            waitFor = 0;
+    void FixedUpdate(){
+        waitFor += Time.fixedDeltaTime;
+        
+        if (active){
+            if (waitFor >= chromosome.GetGenList()[genIndex].GetTime()){
+                genIndex++;
+                if (genIndex >= numOfActions)
+                    active = false;
+                waitFor = 0;
+            }
+            
+            switch (chromosome.GetGenList()[genIndex].GetAction()){
+                case 0:
+                    rb.AddForce(Vector2.right * force * Time.fixedDeltaTime);
+                    break;
+                case 1:
+                    rb.AddForce(-Vector2.right * force * Time.fixedDeltaTime);
+                    break;
+                case 2:
+                    rb.AddForce(Vector2.up * force * Time.fixedDeltaTime);
+                    break;
+                case -1:
+                    break;
+            }
         }
+    }
 
-        switch (chromosome.GetCurrentGenAction()){
-            case 0:
-                rb.AddForce(Vector2.right * force * Time.deltaTime);
-                break;
-            case 1:
-                rb.AddForce(-Vector2.right * force * Time.deltaTime);
-                break;
-            case 2:
-                rb.AddForce(Vector2.up * force * Time.deltaTime);
-                break;
-            case -1:
-                break;
-        }
+    public int GetPoints(){
+        return points;
+    }
+
+    public void SetNumOfGens(int num){
+        chromosome = new Chromosome(num);
+        numOfActions = num;
+        active = true;
+    }
+
+    public void SetChromosome(Chromosome chro){
+        chromosome = chro;
+        active = true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision){
         gameObject.SetActive(false);
+    }
+
+    public Chromosome GetChromosome(){
+        return chromosome;
     }
 }
