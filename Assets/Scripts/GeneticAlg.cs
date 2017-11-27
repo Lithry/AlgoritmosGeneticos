@@ -37,6 +37,10 @@ public class GeneticAlg {
 	}
 
 	public Chromosome Roulette(List<Chromosome> pop){
+		totalPoints = 0;
+		for(int i = 0; i < pop.Count; i++){
+			totalPoints += pop[i].GetPoints();
+		}
 		float rnd = Random.Range(0, totalPoints);
 
 		float points = 0;
@@ -53,23 +57,24 @@ public class GeneticAlg {
 
 	}
 
-	public List<Chromosome> Evolv(List<Chromosome> pop){
+	public List<Chromosome> Evolv(List<Chromosome> oldPopulation){
 		List<Chromosome> population = new List<Chromosome>();
-		pop.Sort(Compare);
+		oldPopulation.Sort(Compare);
 
-		for (int i = 0; i < agents; i++){
-			if (i < elites){
-				population.Add(pop[i]);
-			}
-			else{
-				Chromosome a1 = Roulette(pop);
-				Chromosome a2 = Roulette(pop);
-				Chromosome c1;
-				Chromosome c2;
-				Crossour(a1, a2, out c1, out c2);
-				population.Add(c1);
+		for (int i = 0; i < elites; i++){
+			population.Add(oldPopulation[i]);
+		}
+
+		while (population.Count < agents)
+		{
+			Chromosome a1 = Roulette(oldPopulation);
+			Chromosome a2 = Roulette(oldPopulation);
+			Chromosome c1;
+			Chromosome c2;
+			Crossour(a1, a2, out c1, out c2);
+			population.Add(c1);
+			if (population.Count < agents)
 				population.Add(c2);
-			}
 		}
 			
 		return population;

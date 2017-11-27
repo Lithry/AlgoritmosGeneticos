@@ -33,4 +33,8 @@ public class Chromosome {
     public void AddPoints(float p){
         points += p;
     }
+
+    public void RestartPoints(){
+        points = 0;
+    }
 }

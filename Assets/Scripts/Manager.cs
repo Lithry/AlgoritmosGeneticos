@@ -5,15 +5,19 @@ using UnityEngine;
 public class Manager : MonoBehaviour {
     private List<Agent> agents = new List<Agent>();
     private Vector3 beginPos;
+    public GameObject target;
     private GeneticAlg geneticAlg;
     public GameObject prefab;
     public int NumOfAgents;
     public int NumOfGensPerAgent;
     public int numOfElites;
     public float mutationProbability;
-    public float durationOfSimulation = 0.0f;
+    public float durationOfGen;
+    public float timer = 0.0f;
     [Range(1.0f, 5.0f)]
     public float speedOfSimulation = 1.0f;
+    public float pointsPerDistance;
+    public float pointsPerFly;
     private float fixedDelta;
 
     // Use this for initialization
@@ -32,9 +36,18 @@ public class Manager : MonoBehaviour {
     void FixedUpdate() {
         Time.timeScale = speedOfSimulation;
         Time.fixedDeltaTime = fixedDelta / Time.timeScale;
-        durationOfSimulation += Time.fixedDeltaTime;
+        timer += Time.fixedDeltaTime;
 
-        if (durationOfSimulation > Actions.durationOfGen){
+        for (int i = 0; i < agents.Count; i++)
+        {
+            if (agents[i].transform.position.y > target.transform.position.y){
+                agents[i].AddPoints(pointsPerDistance / Vector3.Distance(agents[i].transform.position, target.transform.position));
+            }
+            /*if (agents[i].gameObject.activeSelf)
+                agents[i].AddPoints(pointsPerFly);*/
+        }
+
+        if (timer > durationOfGen){
             EndOfSimulation();
         }
     }
@@ -43,8 +56,8 @@ public class Manager : MonoBehaviour {
         List<Agent> olds = agents;
         
         List<Chromosome> population = new List<Chromosome>();
-        for (int i = 0; i < agents.Count; i++){
-            population.Add(agents[i].GetChromosome());
+        for (int i = 0; i < olds.Count; i++){
+            population.Add(olds[i].GetChromosome());
         }
         
         population = geneticAlg.Evolv(population);
@@ -52,12 +65,14 @@ public class Manager : MonoBehaviour {
         for (int i = 0; i < olds.Count; i++){
             Destroy(olds[i].gameObject);
 		}
-
-        for (int i = 0; i < agents.Count; i++){
+        olds.Clear();
+        agents.Clear();
+        for (int i = 0; i < NumOfAgents; i++){
             Agent a = Instantiate(prefab).GetComponent<Agent>();
-            a = agents[i];
+            a.SetChromosome(population[i]);
+            agents.Add(a);
         }
         
-        durationOfSimulation = 0;
+        timer = 0;
     }
 }

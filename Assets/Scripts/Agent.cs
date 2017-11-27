@@ -45,8 +45,12 @@ public class Agent : MonoBehaviour {
         }
     }
 
-    public int GetPoints(){
-        return points;
+    public float GetPoints(){
+        return chromosome.GetPoints();
+    }
+
+    public void AddPoints(float value){
+        chromosome.AddPoints(value);
     }
 
     public void SetNumOfGens(int num){
@@ -57,6 +61,7 @@ public class Agent : MonoBehaviour {
 
     public void SetChromosome(Chromosome chro){
         chromosome = chro;
+        chromosome.RestartPoints();
         active = true;
     }
 
