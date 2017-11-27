@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Manager : MonoBehaviour {
     private List<Agent> agents = new List<Agent>();
+    private List<float> agentsLastDistance = new List<float>();
     private Vector3 beginPos;
     public GameObject target;
     private GeneticAlg geneticAlg;
@@ -28,6 +29,8 @@ public class Manager : MonoBehaviour {
         for (int i = 0; i < NumOfAgents; i++) {
             agents.Add(Instantiate(prefab).GetComponent<Agent>());
             agents[i].SetNumOfGens(NumOfGensPerAgent);
+            float a = 100.0f;
+            agentsLastDistance.Add(a);
         }
         fixedDelta = Time.fixedDeltaTime;
     }
@@ -40,8 +43,9 @@ public class Manager : MonoBehaviour {
 
         for (int i = 0; i < agents.Count; i++)
         {
-            if (agents[i].transform.position.y > target.transform.position.y){
-                agents[i].AddPoints(pointsPerDistance / Vector3.Distance(agents[i].transform.position, target.transform.position));
+            if (agents[i].transform.position.y > target.transform.position.y && Vector3.Distance(agents[i].transform.position, target.transform.position) < agentsLastDistance[i]){
+                agentsLastDistance[i] = Vector3.Distance(agents[i].transform.position, target.transform.position);
+                agents[i].AddPoints(pointsPerDistance);
             }
             /*if (agents[i].gameObject.activeSelf)
                 agents[i].AddPoints(pointsPerFly);*/
@@ -53,6 +57,8 @@ public class Manager : MonoBehaviour {
     }
 
     private void EndOfSimulation(){
+        ClearDistanceList();
+
         List<Agent> olds = agents;
         
         List<Chromosome> population = new List<Chromosome>();
@@ -74,5 +80,12 @@ public class Manager : MonoBehaviour {
         }
         
         timer = 0;
+    }
+
+    private void ClearDistanceList(){
+        for (int i = 0; i < agentsLastDistance.Count; i++)
+        {
+            agentsLastDistance[i] = 100.0f;
+        }
     }
 }

@@ -147,6 +147,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1161218044296574, guid: 2e81526fb815dd746a376477c099eed6, type: 2}
+      propertyPath: m_TagString
+      value: Finish
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2e81526fb815dd746a376477c099eed6, type: 2}
   m_IsPrefabParent: 0
@@ -224,12 +228,12 @@ MonoBehaviour:
   NumOfAgents: 30
   NumOfGensPerAgent: 8
   numOfElites: 3
-  mutationProbability: 0
+  mutationProbability: 0.01
   durationOfGen: 8
   timer: 0
   speedOfSimulation: 1
-  pointsPerDistance: 2
-  pointsPerFly: 1
+  pointsPerDistance: 10
+  pointsPerFly: 3
 --- !u!4 &1568482145
 Transform:
   m_ObjectHideFlags: 0

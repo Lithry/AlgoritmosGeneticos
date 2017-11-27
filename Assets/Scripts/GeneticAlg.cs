@@ -53,8 +53,21 @@ public class GeneticAlg {
 		return null;
 	}
 
-	public void Mutation(){
+	public List<Chromosome> Mutation(List<Chromosome> population){
+		float rnd;
 
+		for (int i = 0; i < population.Count; i++){
+			List<Gen> gens = population[i].GetGenList();
+			for (int j = 0; j < gens.Count; j++){
+				rnd = Random.Range(0.0f, 1.0f);
+				if (rnd < mutation){
+					float mutTime = Random.Range(-0.2f, 0.2f);
+					gens[j].MutateTime(mutTime);
+				}
+			}
+		}
+
+		return population;
 	}
 
 	public List<Chromosome> Evolv(List<Chromosome> oldPopulation){
@@ -76,15 +89,17 @@ public class GeneticAlg {
 			if (population.Count < agents)
 				population.Add(c2);
 		}
-			
+		
+		population = Mutation(population);
+
 		return population;
 	}
 
 	private int Compare(Chromosome a1, Chromosome a2){
 		if (a1.GetPoints() > a2.GetPoints())
-			return 1;
-		else if (a1.GetPoints() < a2.GetPoints())
 			return -1;
+		else if (a1.GetPoints() < a2.GetPoints())
+			return 1;
 		else
 			return 0;
 	}

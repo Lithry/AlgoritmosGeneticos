@@ -10,7 +10,7 @@ public class Agent : MonoBehaviour {
     private int numOfActions;
     private int genIndex;
     public float force;
-    private int points;
+    public float points;
 
     void Awake(){
         genIndex = 0;
@@ -20,6 +20,7 @@ public class Agent : MonoBehaviour {
 
     void FixedUpdate(){
         waitFor += Time.fixedDeltaTime;
+        points = chromosome.GetPoints();
         
         if (active){
             if (waitFor >= chromosome.GetGenList()[genIndex].GetTime()){
@@ -67,6 +68,11 @@ public class Agent : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision){
         gameObject.SetActive(false);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision){
+        if (collision.gameObject.tag == "Finish")
+            AddPoints(500);
     }
 
     public Chromosome GetChromosome(){

@@ -23,4 +23,8 @@ public class Gen {
     public float GetTime(){
         return time;
     }
+
+    public void MutateTime(float mutation){
+        time += mutation;
+    }
 }
