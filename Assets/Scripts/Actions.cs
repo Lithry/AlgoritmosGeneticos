@@ -10,7 +10,7 @@ static public class Actions {
 		Up,
 		Total
 	}
-	public const float MaxTime = 3.0f;
-	public const float MinTime = 0.1f;
-    public const float durationOfGen = 30.0f;
+	public const float MaxTime = 1.5f;
+	public const float MinTime = 0.5f;
+    
 }

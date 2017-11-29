@@ -18,7 +18,27 @@ public class GeneticAlg {
 	public void Crossour(Chromosome dad, Chromosome mom, out Chromosome child1, out Chromosome child2){
 		Chromosome nChro1 = new Chromosome();
 		Chromosome nChro2 = new Chromosome();
-		for (int i = 0; i < gens; i++)
+
+		int pivot = Random.Range(0, dad.GetGenList().Count);
+
+		for (int i = 0; i < pivot; i++)
+		{
+			Gen nGen1 = new Gen(dad.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
+			Gen nGen2 = new Gen(mom.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
+
+			nChro1.AddGen(nGen1);
+			nChro2.AddGen(nGen2);
+		}	
+
+		for (int i = pivot; i < gens; i++)
+		{
+			Gen nGen1 = new Gen(mom.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
+			Gen nGen2 = new Gen(dad.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
+			
+			nChro1.AddGen(nGen1);
+			nChro2.AddGen(nGen2);
+		}	
+		/*for (int i = 0; i < gens; i++)
 		{
 			Gen nGen1 = new Gen(dad.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
 			Gen nGen2 = new Gen(mom.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
@@ -31,7 +51,7 @@ public class GeneticAlg {
 				nChro2.AddGen(nGen1);
 			}
 			
-		}
+		}*/
 		child1 = nChro1;
 		child2 = nChro2;
 	}

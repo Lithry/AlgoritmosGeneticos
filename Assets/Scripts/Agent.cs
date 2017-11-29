@@ -26,7 +26,10 @@ public class Agent : MonoBehaviour {
             if (waitFor >= chromosome.GetGenList()[genIndex].GetTime()){
                 genIndex++;
                 if (genIndex >= numOfActions)
+                {
                     active = false;
+                    return;
+                }
                 waitFor = 0;
             }
             

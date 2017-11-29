@@ -43,10 +43,14 @@ public class Manager : MonoBehaviour {
 
         for (int i = 0; i < agents.Count; i++)
         {
-            if (agents[i].transform.position.y > target.transform.position.y && Vector3.Distance(agents[i].transform.position, target.transform.position) < agentsLastDistance[i]){
+            float dist = Vector3.Distance(agents[i].transform.position, target.transform.position);
+            float distY = agents[i].transform.position.y - target.transform.position.y;
+            agents[i].AddPoints((pointsPerDistance /*+ pointsPerFly * distY*/) / dist);
+
+            /*if (agents[i].transform.position.y > target.transform.position.y && Vector3.Distance(agents[i].transform.position, target.transform.position) < agentsLastDistance[i]){
                 agentsLastDistance[i] = Vector3.Distance(agents[i].transform.position, target.transform.position);
                 agents[i].AddPoints(pointsPerDistance);
-            }
+            }*/
             /*if (agents[i].gameObject.activeSelf)
                 agents[i].AddPoints(pointsPerFly);*/
         }
