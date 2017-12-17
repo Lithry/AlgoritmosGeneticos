@@ -1,95 +1,93 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Manager : MonoBehaviour {
-    private List<Agent> agents = new List<Agent>();
-    private List<float> agentsLastDistance = new List<float>();
-    private Vector3 beginPos;
-    public GameObject target;
-    private GeneticAlg geneticAlg;
-    public GameObject prefab;
-    public int NumOfAgents;
-    public int NumOfGensPerAgent;
-    public int numOfElites;
-    public float mutationProbability;
-    public float durationOfGen;
-    public float timer = 0.0f;
-    [Range(1.0f, 5.0f)]
-    public float speedOfSimulation = 1.0f;
-    public float pointsPerDistance;
-    public float pointsPerFly;
-    private float fixedDelta;
+	public GameObject agent;
+	public int agentNum;
+	private List<Lander> agents = new List<Lander>();
+	public GameObject plataformPrefab;
+	public int elitesNum;
+	public int numOfGens;
+	[Range(0.00f, 1.00f)]
+	public float mutation;
+	public int durationOfGeneration;
+	[Range(1, 50)]
+	public int iterations;
+	private float timer;
+	private GeneticAlg ga;
+	private int generation;
+	public Text generationText;
+	public Text timerText;
+	private Vector3 landerBeginPos;
 
-    // Use this for initialization
-    void Awake() {
-        geneticAlg = new GeneticAlg(numOfElites, NumOfAgents, NumOfGensPerAgent, mutationProbability);
-        beginPos.Set(-5, 2, 0);
+	void Awake () {
+		generation = 1;
+		timer = 0.0f;
+		
+		GameObject plataform = Instantiate(plataformPrefab, new Vector3(-10, 0, -10), Quaternion.Euler(90, 0, 0));
 
-        for (int i = 0; i < NumOfAgents; i++) {
-            agents.Add(Instantiate(prefab).GetComponent<Agent>());
-            agents[i].SetNumOfGens(NumOfGensPerAgent);
-            float a = 100.0f;
-            agentsLastDistance.Add(a);
-        }
-        fixedDelta = Time.fixedDeltaTime;
-    }
+        landerBeginPos = new Vector3(10, 0, 10);
+		for (int i = 0; i < agentNum; i++){
+            GameObject obj = Instantiate(agent, landerBeginPos, Quaternion.Euler(90, 0, 0));
+			Lander lan = obj.GetComponent<Lander>();
+			
+			lan.SetPlataformPos(plataform.transform.position);
+			
+			List<Gen> gens = new List<Gen>();
+			for (int j = 0; j < numOfGens; j++)
+			{
+				Gen g = new Gen();
+				gens.Add(g);
+			}
+			lan.SetGenList(gens);
 
-    // Update is called once per frame
-    void FixedUpdate() {
-        Time.timeScale = speedOfSimulation;
-        Time.fixedDeltaTime = fixedDelta / Time.timeScale;
-        timer += Time.fixedDeltaTime;
-
-        for (int i = 0; i < agents.Count; i++)
-        {
-            float dist = Vector3.Distance(agents[i].transform.position, target.transform.position);
-            float distY = agents[i].transform.position.y - target.transform.position.y;
-            agents[i].AddPoints((pointsPerDistance /*+ pointsPerFly * distY*/) / dist);
-
-            /*if (agents[i].transform.position.y > target.transform.position.y && Vector3.Distance(agents[i].transform.position, target.transform.position) < agentsLastDistance[i]){
-                agentsLastDistance[i] = Vector3.Distance(agents[i].transform.position, target.transform.position);
-                agents[i].AddPoints(pointsPerDistance);
-            }*/
-            /*if (agents[i].gameObject.activeSelf)
-                agents[i].AddPoints(pointsPerFly);*/
-        }
-
-        if (timer > durationOfGen){
-            EndOfSimulation();
-        }
-    }
-
-    private void EndOfSimulation(){
-        ClearDistanceList();
-
-        List<Agent> olds = agents;
-        
-        List<Chromosome> population = new List<Chromosome>();
-        for (int i = 0; i < olds.Count; i++){
-            population.Add(olds[i].GetChromosome());
-        }
-        
-        population = geneticAlg.Evolv(population);
-        
-        for (int i = 0; i < olds.Count; i++){
-            Destroy(olds[i].gameObject);
+			if (i == 0)
+				ga = new GeneticAlg(elitesNum, agentNum, numOfGens, mutation);
+			
+			agents.Add(lan);
 		}
-        olds.Clear();
-        agents.Clear();
-        for (int i = 0; i < NumOfAgents; i++){
-            Agent a = Instantiate(prefab).GetComponent<Agent>();
-            a.SetChromosome(population[i]);
-            agents.Add(a);
-        }
-        
-        timer = 0;
-    }
+	}
+	
+	void FixedUpdate () {
+		generationText.text = "Generation: " + generation.ToString();
+		timerText.text = "Time: " + timer.ToString("F2");
+		for (int i = 0; i < iterations; i++){
+			for (int j = 0; j < agents.Count; j++){
+				agents[j].UpdateLander(Time.fixedDeltaTime);
+			}
+			timer += Time.fixedDeltaTime;
+		}
+		if (timer > durationOfGeneration)
+			Evolve();
+	}
 
-    private void ClearDistanceList(){
-        for (int i = 0; i < agentsLastDistance.Count; i++)
-        {
-            agentsLastDistance[i] = 100.0f;
-        }
-    }
+	private void Evolve(){
+		float maxFitness = agents[0].GetFitness();
+		List<Chromosome> chromList = new List<Chromosome>();
+		for (int i = 0; i < agents.Count; i++){
+			Chromosome c = new Chromosome();
+			c.fitness = agents[i].GetFitness();
+			if (maxFitness < c.fitness)
+				maxFitness = c.fitness;
+			c.weights = agents[i].GetGensList();
+			chromList.Add(c);
+		}
+		Debug.Log("Gen " + generation.ToString() + " max Fitness: " + maxFitness.ToString("F0"));
+		chromList = ga.Evolv(chromList);
+
+		for (int i = 0; i < agents.Count; i++)
+		{
+			agents[i].SetGenList(chromList[i].weights);
+		}
+
+		for (int i = 0; i < agents.Count; i++)
+		{
+			agents[i].transform.position = landerBeginPos;
+		}
+
+		timer = 0.0f;
+		generation++;
+	}
 }

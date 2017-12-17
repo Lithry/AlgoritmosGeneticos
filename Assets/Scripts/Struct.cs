@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct Chromosome{
+	public float fitness;
+	public List<Gen> weights;
+}
+
 static public class Actions {
 	public enum Action
 	{

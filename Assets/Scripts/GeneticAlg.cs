@@ -17,41 +17,23 @@ public class GeneticAlg {
 
 	public void Crossour(Chromosome dad, Chromosome mom, out Chromosome child1, out Chromosome child2){
 		Chromosome nChro1 = new Chromosome();
+		nChro1.weights = new List<Gen>();
 		Chromosome nChro2 = new Chromosome();
-
-		int pivot = Random.Range(0, dad.GetGenList().Count);
-
-		for (int i = 0; i < pivot; i++)
+		nChro2.weights = new List<Gen>();
+		int rnd = Random.Range(0, gens);
+		
+		for (int i = 0; i < gens; i++)
 		{
-			Gen nGen1 = new Gen(dad.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
-			Gen nGen2 = new Gen(mom.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
-
-			nChro1.AddGen(nGen1);
-			nChro2.AddGen(nGen2);
-		}	
-
-		for (int i = pivot; i < gens; i++)
-		{
-			Gen nGen1 = new Gen(mom.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
-			Gen nGen2 = new Gen(dad.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
-			
-			nChro1.AddGen(nGen1);
-			nChro2.AddGen(nGen2);
-		}	
-		/*for (int i = 0; i < gens; i++)
-		{
-			Gen nGen1 = new Gen(dad.GetGenList()[i].GetAction(), mom.GetGenList()[i].GetTime());
-			Gen nGen2 = new Gen(mom.GetGenList()[i].GetAction(), dad.GetGenList()[i].GetTime());
-			if (i % 2 == 0){
-				nChro1.AddGen(nGen1);
-				nChro2.AddGen(nGen2);
+			if (i < rnd){
+				nChro1.weights.Add(dad.weights[i]);
+				nChro2.weights.Add(mom.weights[i]);
 			}
 			else{
-				nChro1.AddGen(nGen2);
-				nChro2.AddGen(nGen1);
+				nChro1.weights.Add(mom.weights[i]);
+				nChro2.weights.Add(dad.weights[i]);
 			}
 			
-		}*/
+		}
 		child1 = nChro1;
 		child2 = nChro2;
 	}
@@ -59,30 +41,28 @@ public class GeneticAlg {
 	public Chromosome Roulette(List<Chromosome> pop){
 		totalPoints = 0;
 		for(int i = 0; i < pop.Count; i++){
-			totalPoints += pop[i].GetPoints();
+			totalPoints += pop[i].fitness;
 		}
 		float rnd = Random.Range(0, totalPoints);
 
 		float points = 0;
 
 		for(int i = 0; i < pop.Count; i++){
-			points += pop[i].GetPoints();
+			points += pop[i].fitness;
 			if (points >= rnd)
 				return pop[i];
 		}
-		return null;
+		return pop[0];
 	}
 
 	public List<Chromosome> Mutation(List<Chromosome> population){
 		float rnd;
 
 		for (int i = 0; i < population.Count; i++){
-			List<Gen> gens = population[i].GetGenList();
-			for (int j = 0; j < gens.Count; j++){
+			for (int j = 0; j < population[i].weights.Count; j++){
 				rnd = Random.Range(0.0f, 1.0f);
 				if (rnd < mutation){
-					float mutTime = Random.Range(-0.2f, 0.2f);
-					gens[j].MutateTime(mutTime);
+					population[i].weights[j].MutateTime(Random.Range(-0.2f, 0.2f));
 				}
 			}
 		}
@@ -116,9 +96,9 @@ public class GeneticAlg {
 	}
 
 	private int Compare(Chromosome a1, Chromosome a2){
-		if (a1.GetPoints() > a2.GetPoints())
+		if (a1.fitness > a2.fitness)
 			return -1;
-		else if (a1.GetPoints() < a2.GetPoints())
+		else if (a1.fitness < a2.fitness)
 			return 1;
 		else
 			return 0;
